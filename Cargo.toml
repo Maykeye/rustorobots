@@ -4,3 +4,5 @@ version = "0.1.0"
 authors = ["Maykeye <maykeye@users.noreply.github.com>"]
 
 [dependencies]
+rand="0.3.0"
+ncurses = "5.85.0"
