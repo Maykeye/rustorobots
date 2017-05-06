@@ -271,10 +271,11 @@ impl GameField{
 fn main() {
     
     let mut game_field = GameField::new(INITIAL_ROBOTS);
-
     let mut buf =  String::new();
+
     loop 
     {
+        buf.clear();
         game_field.debug_print();
         if game_field.player_is_dead() {
             println!("You have lost.");
