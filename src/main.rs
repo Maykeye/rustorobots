@@ -155,8 +155,6 @@ impl GameField{
             println!("{}", row);
         }
         println!("");
-
-        println!("E#={:?}", &self.entities[0].position);
     }
 
     /// Return a refence to player
@@ -201,7 +199,7 @@ impl GameField{
             self.pos_to_idx.insert((self.entities[i].position.x, self.entities[i].position.y), i);
         }
 
-        // Transform collided entites
+        // Transform collided entities
         for i in 0..(self.entities.len()) {
             self.check_collision(i)
         }
@@ -239,6 +237,21 @@ impl GameField{
         self.entities[0].position = self.entities[0].position.clone_add(dx, dy);
         self.check_collision(0)
     }
+
+    /// Return true iff player is dead
+    fn player_is_dead(&self) -> bool {
+        self.entities[0].kind == EntityKind::Garbage
+    }
+
+    /// Teleport the player to random location on the map.
+    fn teleport_player(&mut self) {
+        let x = rand::thread_rng().gen_range(0, FIELD_WIDTH);
+        let y = rand::thread_rng().gen_range(0, FIELD_HEIGHT);
+        self.pos_to_idx.remove(&(self.entities[0].position.x, self.entities[0].position.y));
+        (&mut self.entities[0]).position = Position::new(x, y);
+        self.check_collision(0);
+        self.pos_to_idx.insert((self.entities[0].position.x, self.entities[0].position.y),0);
+    }
 }
 
 
@@ -256,6 +269,10 @@ fn main() {
     loop 
     {
         game_field.debug_print();
+        if game_field.player_is_dead() {
+            println!("You have lost.");
+            break;
+        }
 
         let mut buf =  String::new();
         io::stdin().read_line(&mut buf)
@@ -277,6 +294,8 @@ fn main() {
         } else if buf == "d" {
             game_field.move_player(1, 0);
             game_field.move_robots();
+        } else if buf == "t" {
+            game_field.teleport_player();
         }
     }
 }
