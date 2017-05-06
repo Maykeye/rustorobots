@@ -252,6 +252,12 @@ impl GameField{
         self.check_collision(0);
         self.pos_to_idx.insert((self.entities[0].position.x, self.entities[0].position.y),0);
     }
+
+
+    // Count remaining robots on the field
+    fn count_robots(&self) -> usize {
+        self.entities.iter().filter(|x| x.kind == EntityKind::Robot).count()
+    }
 }
 
 
@@ -266,6 +272,7 @@ fn main() {
     
     let mut game_field = GameField::new(INITIAL_ROBOTS);
 
+    let mut buf =  String::new();
     loop 
     {
         game_field.debug_print();
@@ -273,14 +280,17 @@ fn main() {
             println!("You have lost.");
             break;
         }
+        if game_field.count_robots() == 0 {
+            println!("You've won!");
+            break;
+        }
 
-        let mut buf =  String::new();
         io::stdin().read_line(&mut buf)
             .expect("Cannot read command from stdin");
         let buf = buf.trim();
         if buf == "." {
             game_field.move_robots()
-        } else if buf == "q" {
+        } else if buf == "quit" {
             break;
         } else if buf == "w" {
             game_field.move_player(0, -1);
@@ -294,8 +304,21 @@ fn main() {
         } else if buf == "d" {
             game_field.move_player(1, 0);
             game_field.move_robots();
+        } else if buf == "q" {
+            game_field.move_player(-1, -1);
+            game_field.move_robots();
+        } else if buf == "e" {
+            game_field.move_player(1, -1);
+            game_field.move_robots();
+        } else if buf == "z" {
+            game_field.move_player(-1, 1);
+            game_field.move_robots();
+        } else if buf == "c" {
+            game_field.move_player(1, 1);
+            game_field.move_robots();
         } else if buf == "t" {
             game_field.teleport_player();
+            game_field.move_robots();
         }
     }
 }
